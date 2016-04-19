@@ -1,0 +1,13 @@
+# Build tools
+_build/
+node_modules/
+bower_components/
+
+# Editor cache
+.~*
+*~
+*.kate-swp
+*.swp
+
+# File manager
+.directory

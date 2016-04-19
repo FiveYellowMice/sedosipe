@@ -1,0 +1,23 @@
+{
+  "name": "sedosipe",
+  "version": "1.0.0",
+  "description": "TV show progress tracker with customized data.",
+  "main": "index.html",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FiveYellowMice/sedosipe.git"
+  },
+  "author": "FiveYellowMice",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/FiveYellowMice/sedosipe/issues"
+  },
+  "homepage": "https://github.com/FiveYellowMice/sedosipe#readme",
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-liquid": "^0.1.0",
+    "js-yaml": "^3.6.0",
+    "rimraf": "^2.5.2"
+  }
+}
