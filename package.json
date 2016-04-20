@@ -15,9 +15,10 @@
   },
   "homepage": "https://github.com/FiveYellowMice/sedosipe#readme",
   "devDependencies": {
+    "del": "^2.2.0",
     "gulp": "^3.9.1",
+    "gulp-connect": "^3.2.2",
     "gulp-liquid": "^0.1.0",
-    "js-yaml": "^3.6.0",
-    "rimraf": "^2.5.2"
+    "js-yaml": "^3.6.0"
   }
 }
