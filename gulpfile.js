@@ -1,4 +1,5 @@
 const gulp = require("gulp");
+const gutil = require("gulp-util");
 const liquid = require('gulp-liquid');
 const connect = require("gulp-connect");
 const fs = require("fs");
@@ -18,9 +19,10 @@ function build(glob) {
 
 gulp.task("serve", ["rebuild"], function() {
 	gulp.watch(liquidFiles, function(event) {
-		console.log(`'${event.path}' has ${event.type}.`);
+		gutil.log(`'${event.path}' has ${event.type}.`);
 		switch (event.type) {
 			case "added":
+			case "renamed":
 			case "changed":
 				build(event.path);
 				break;
