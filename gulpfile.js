@@ -2,6 +2,7 @@ const gulp = require("gulp");
 const gutil = require("gulp-util");
 const liquid = require('gulp-liquid');
 const sass = require("gulp-sass");
+const autoprefixer = require("gulp-autoprefixer");
 const connect = require("gulp-connect");
 const fs = require("fs");
 const del = require("del");
@@ -32,6 +33,7 @@ gulp.task("liquid", function() {
 gulp.task("sass", function() {
 	gulp.src(sassFiles)
 		.pipe(sass({ outputStyle: "compressed" }).on('error', sass.logError))
+		.pipe(autoprefixer({ browsers: ["Chrome >= 38", "Firefox ESR", "iOS >= 8", "Explorer 11", "Android >= 4.4"] }))
 		.pipe(gulp.dest("./_build/"));
 });
 

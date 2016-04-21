@@ -20,6 +20,7 @@
     "jquery": "^2.2.3",
     "es6-promise-polyfill": "^1.1.1",
     "lodash": "^4.11.1",
-    "velocity": "^1.2.3"
+    "velocity": "^1.2.3",
+    "material-design-icons": "^2.2.3"
   }
 }

@@ -4,3 +4,12 @@ lang: en
 description: TV show progress tracker with customized data.
 noJsNotice: Sorry, sedosipE requires JavaScript to run, but it is either disabled or not supported by your browser.
 loading: Loading...
+
+allShows: All
+watchingShows: Watching
+completedShows: Completed
+droppedShows: Dropped
+plannedShows: Planned
+
+refresh: Refresh
+settings: Settings
