@@ -7,6 +7,8 @@ body {
 }
 
 .menu {
+	$menu-width: 144px;
+
 	position: fixed;
 	z-index: 8;
 	@include material-shadow(8px);
@@ -15,6 +17,7 @@ body {
 	color: black;
 
 	padding: 8px 0;
+	width: $menu-width;
 
 	a {
 		display: flex;
@@ -36,6 +39,15 @@ body {
 			background: rgba(0, 0, 0, 0.5);
 		}
 	}
+}
+
+.menu-outside-catcher {
+	position: fixed;
+	z-index: 7;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100vh;
 }
 
 .main-interface {
@@ -92,20 +104,14 @@ body {
 	margin-right: 12px;
 }
 
-.top-bar-menu {
-	top: 12px;
-	right: 12px;
-	width: 112px;
-}
-
 .sidebar {
-	$sidebarWidth: 264px;
+	$sidebar-width: 264px;
 
 	position: fixed;
 	z-index: 16;
 	top: 0;
-	left: -$sidebarWidth - 16px;
-	width: $sidebarWidth;
+	left: -$sidebar-width - 16px;
+	width: $sidebar-width;
 	height: 100vh;
 	overflow-y: auto;
 

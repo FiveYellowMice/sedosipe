@@ -24,17 +24,14 @@ function constructInterface() { return Promise.all([
 				$("<h1>").addClass("top-bar-heading").text("sedosipE"),
 				$("<div>").addClass("top-bar-right-buttons").append(
 					$("<a>").addClass("top-bar-button material-icons").html("search").attr("href", "javascript:void(0)"),
-					$("<a>").addClass("top-bar-button material-icons").html("more_vert").attr("href", "javascript:void(0)").click(function() {
-						console.log("show menu");
-						$(".topbar").append(createMenu("top-bar-menu", [
-							{
-								name: "{{ refresh }}"
-							},
-							{
-								name: "{{ settings }}"
-							}
-						]));
-					})
+					$("<a>").addClass("top-bar-button material-icons").html("more_vert").attr("href", "javascript:void(0)").click(createMenu([
+						{
+							name: "{{ refresh }}"
+						},
+						{
+							name: "{{ settings }}"
+						}
+					]))
 				)
 			),
 
@@ -80,18 +77,26 @@ function toggleSideBar(arg) {
 	}
 }
 
-function createMenu(className, list) {
-	// Returns a jQuery object of menu UI component created on a list of objects with compulsory name and optional behavior.
-	var div = $("<div>").addClass(className + " menu");
+function createMenu(list) { return function(event) {
+	// Returns a function that shows menu UI component created on a list of objects with compulsory name and optional behavior.
+	var div = $("<div>").addClass("menu");
 	list.forEach(function(item) {
 		var newItem = $("<a>").text(item.name).attr("href", "javascript:void(0)");
 		if (item.behavior) newItem.click(behavior);
 		div.append(newItem);
 	});
-	div.mouseleave(function() {
+
+	div.css({
+		top: (event.pageY - $(document).scrollTop() - 12) + "px",
+		left: (event.pageX - 144 + 12) + "px"
+	});
+
+	var catcher = $("<div>").addClass("menu-outside-catcher").click(function() {
 		$(".menu").velocity("fadeOut", { duration: 200, complete: function() {
+			$(".menu-outside-catcher").remove();
 			$(".menu").remove();
 		} });
 	});
-	return div;
-}
+
+	$("body").append(catcher, div);
+} }
