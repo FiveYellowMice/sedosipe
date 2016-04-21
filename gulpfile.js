@@ -1,6 +1,7 @@
 const gulp = require("gulp");
 const gutil = require("gulp-util");
 const liquid = require('gulp-liquid');
+const sass = require("gulp-sass");
 const connect = require("gulp-connect");
 const fs = require("fs");
 const del = require("del");
@@ -8,30 +9,11 @@ const yaml = require("js-yaml");
 const child = require("child_process");
 
 var liquidFiles = ["**/*.html", "**/*.js", "!node_modules/**", "!_build/**", "!gulpfile.js"];
-
-function build(glob) {
-	gulp.src(glob)
-	.pipe(liquid({
-		locals: yaml.safeLoad(fs.readFileSync("strings.yaml", "utf-8"))
-	}))
-	.pipe(gulp.dest("./_build/"));
-}
+var sassFiles = ["**/*.scss", "!node_modules/**", "!_build/**"];
 
 gulp.task("serve", ["rebuild"], function() {
-	gulp.watch(liquidFiles, function(event) {
-		gutil.log(`'${event.path}' has ${event.type}.`);
-		switch (event.type) {
-			case "added":
-			case "renamed":
-			case "changed":
-				build(event.path);
-				break;
-			case "deleted":
-				del(event.path);
-				break;
-		}
-	});
-	gulp.watch("strings.yaml", ["rebuild"]);
+	gulp.watch(liquidFiles.concat("strings.yaml"), ["liquid"]);
+	gulp.watch(sassFiles, ["sass"]);
 
 	connect.server({
 		root: "_build",
@@ -39,9 +21,18 @@ gulp.task("serve", ["rebuild"], function() {
 	});
 });
 
-gulp.task("rebuild", function() {
-	del(["_build/**", "!_build", "!_build/bower_components/**"]);
-	build(liquidFiles);
+gulp.task("liquid", function() {
+	gulp.src(liquidFiles)
+		.pipe(liquid({
+			locals: yaml.safeLoad(fs.readFileSync("strings.yaml", "utf-8"))
+		}))
+		.pipe(gulp.dest("./_build/"));
+});
+
+gulp.task("sass", function() {
+	gulp.src(sassFiles)
+		.pipe(sass({ outputStyle: "compressed" }).on('error', sass.logError))
+		.pipe(gulp.dest("./_build/"));
 });
 
 gulp.task("bower", function(cb) {
@@ -49,5 +40,11 @@ gulp.task("bower", function(cb) {
 		cb();
 	});
 });
+
+gulp.task("clean", function() {
+	del(["_build/**", "!_build", "!_build/bower_components/**"]);
+});
+
+gulp.task("rebuild", ["clean", "sass", "liquid"]);
 
 gulp.task("default", ["rebuild", "bower"]);
