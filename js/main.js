@@ -108,6 +108,7 @@ function createMenu(list) { return function(event) {
 } }
 
 var db;
+var preferences = {};
 // Load database from localStorage or other cloud services, or create a new one
 function loadDatabase() { return new Promise(function(resolve) {
 	var sql = window.SQL;
@@ -119,7 +120,7 @@ function loadDatabase() { return new Promise(function(resolve) {
 		db = new sql.Database();
 		db.run("CREATE TABLE metadata (version int, time_created int, time_modified int)");
 		db.run("INSERT INTO metadata (version, time_created, time_modified) VALUES (1, " + Date.now() + ", " + Date.now() + ")");
-		localStorage.setItem("database", new TextDecoder("utf-16le").decode(db.export()));
+		saveDB();
 	}
 	console.log(
 		"Database info:\n" +
@@ -129,3 +130,13 @@ function loadDatabase() { return new Promise(function(resolve) {
 	);
 	resolve();
 }); }
+
+// Function should be run every time DB is modified
+function updateDB() {
+	db.run("UPDATE metadata SET time_modified = " + Date.now());
+	if (preferences.autoSave) saveDB();
+}
+
+function saveDB() {
+	localStorage.setItem("database", new TextDecoder("utf-16le").decode(db.export()));
+}
