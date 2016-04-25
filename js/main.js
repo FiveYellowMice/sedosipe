@@ -123,6 +123,7 @@ function loadDatabase() { return new Promise(function(resolve) {
 	}
 	console.log(
 		"Database info:\n" +
+		"    Format version: " + db.exec("SELECT version FROM metadata")[0].values[0][0] + "\n" +
 		"    Creation time: " + new Date(db.exec("SELECT time_created FROM metadata")[0].values[0][0]) + "\n" +
 		"    Last modified: " + new Date(db.exec("SELECT time_modified FROM metadata")[0].values[0][0])
 	);
