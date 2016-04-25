@@ -128,10 +128,8 @@
 					require("{{ baseurl }}/bower_components/jquery/dist/jquery.min.js")
 						.then(function() { return require("{{ baseurl }}/bower_components/velocity/velocity.min.js"); }),
 					require("{{ baseurl }}/js/main.js")
-				]).then(function() {
-					constructInterface().then(function() { clearInterval(animationId); });
-					loadDatabase();
-				});
+				]).then(function() { return doConstruction(); })
+				.then(function() { clearInterval(animationId); });
 			});
 			</script>
 		</div>

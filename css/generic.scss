@@ -1,5 +1,5 @@
 @mixin material-shadow($depth) {
-	box-shadow: 1px 0 $depth 1px rgba(0, 0, 0, 0.5);
+	box-shadow: 0 1px $depth 1px rgba(0, 0, 0, 0.5);
 }
 
 body {
@@ -156,4 +156,55 @@ body {
 	z-index: 15;
 	top: 0;
 	left: 0;
+}
+
+.show-list {
+	list-style-type: none;
+}
+
+.show-item {
+	z-index: 2;
+	@include material-shadow(2px);
+	border-radius: 2px;
+	background: white;
+
+	margin: 12px 0;
+
+	height: 72px;
+	padding: 6px;
+	box-sizing: border-box;
+	display: flex;
+	align-items: center;
+}
+
+.show-title {
+	font-weight: bold;
+}
+
+.show-item-right-part {
+	float: right;
+	margin-left: auto;
+	margin-right: 0;
+
+	display: flex;
+	align-items: center;
+}
+
+.show-item-status {
+	font-weight: bold;
+	text-transform: uppercase;
+}
+
+.show-item-button {
+	margin: 1px;
+	padding: 12px;
+	border-radius: 100%;
+
+	text-decoration: none;
+	color: inherit;
+	transition: background 0.2s ease-out;
+
+	&:active {
+		background: rgba(0, 0, 20, 0.5);
+	}
 }

@@ -1,4 +1,7 @@
-function constructInterface() { return Promise.all([
+var db;
+var preferences = {};
+
+function doConstruction() { return Promise.all([
 
 	new Promise(function(resolve) {
 		$("head").append($("<link>")
@@ -16,7 +19,8 @@ function constructInterface() { return Promise.all([
 		);
 	}),
 
-	new Promise(function(resolve) {
+	// Interface
+	new Promise(function constructInterface(resolve) {
 		$("body").append(
 			// Top bar
 			$("<div>").addClass("topbar").append(
@@ -57,9 +61,60 @@ function constructInterface() { return Promise.all([
 			$("<div>").addClass("main-interface")
 		);
 		resolve();
+	}),
+
+	// Load database from localStorage or other cloud services, or create a new one
+	new Promise(function loadDatabase(resolve) {
+		var sql = window.SQL;
+		if (localStorage.hasOwnProperty("database")) {
+			// Load existing
+			db = new sql.Database(new TextEncoder("utf-16le").encode(localStorage.getItem("database")));
+		} else {
+			// Create new
+			db = new sql.Database();
+			db.run("CREATE TABLE metadata (version int, time_created int, time_modified int)");
+			db.run("INSERT INTO metadata (version, time_created, time_modified) VALUES (1, " + Date.now() + ", " + Date.now() + ")");
+			db.run("CREATE TABLE shows (id INTEGER PRIMARY KEY, title text NOT NULL, image text, stars int CHECK(stars >= 0 AND stars <= 5), status text, total_episodes int, watched_episodes int, start_date int, finish_date int, comment text)");
+			/*
+			ID | Title | Image | Stars | Status | Total episodes | Watched episodes | Start date | Finish date | Comment
+			*/
+			saveDB();
+		}
+		console.log(
+			"Database info:\n" +
+			"    Format version: " + db.exec("SELECT version FROM metadata")[0].values[0][0] + "\n" +
+			"    Creation time: " + new Date(db.exec("SELECT time_created FROM metadata")[0].values[0][0]) + "\n" +
+			"    Last modified: " + new Date(db.exec("SELECT time_modified FROM metadata")[0].values[0][0])
+		);
+		resolve();
 	})
 
-]).then(function() { return new Promise(function(resolve) {
+]).then(function showListData() { return new Promise(function(resolve) {
+	var list = $("<ol>").addClass("show-list");
+	$(".main-interface").append(list);
+
+	var shows = db.exec("SELECT title, status, total_episodes, watched_episodes FROM shows")[0].values;
+	shows.forEach(function(show) {
+		list.append($("<li>")
+			.addClass("show-item")
+			.append(
+				$("<span>").addClass("show-title").text(show[0])
+			).append($("<div>").addClass("show-item-right-part").append(
+				$("<span>").addClass("show-item-status").text(String(show[1])),
+				$("<a>").addClass("show-item-button material-icons").html("more_vert").attr("href", "javascript:void(0)").click(createMenu([
+					{
+						name: "{{ delete }}"
+					},
+					{
+						name: "{{ detial }}"
+					}
+				]))
+			))
+		);
+	});
+	resolve();
+
+}); }).then(function() { return new Promise(function(resolve) {
 	$(".preload").velocity("fadeOut", { duration: 400, easing: "easeInOutCubic" }, resolve);
 }); }); }
 
@@ -106,30 +161,6 @@ function createMenu(list) { return function(event) {
 		} });
 	}
 } }
-
-var db;
-var preferences = {};
-// Load database from localStorage or other cloud services, or create a new one
-function loadDatabase() { return new Promise(function(resolve) {
-	var sql = window.SQL;
-	if (localStorage.hasOwnProperty("database")) {
-		// Load existing
-		db = new sql.Database(new TextEncoder("utf-16le").encode(localStorage.getItem("database")));
-	} else {
-		// Create new
-		db = new sql.Database();
-		db.run("CREATE TABLE metadata (version int, time_created int, time_modified int)");
-		db.run("INSERT INTO metadata (version, time_created, time_modified) VALUES (1, " + Date.now() + ", " + Date.now() + ")");
-		saveDB();
-	}
-	console.log(
-		"Database info:\n" +
-		"    Format version: " + db.exec("SELECT version FROM metadata")[0].values[0][0] + "\n" +
-		"    Creation time: " + new Date(db.exec("SELECT time_created FROM metadata")[0].values[0][0]) + "\n" +
-		"    Last modified: " + new Date(db.exec("SELECT time_modified FROM metadata")[0].values[0][0])
-	);
-	resolve();
-}); }
 
 // Function should be run every time DB is modified
 function updateDB() {
