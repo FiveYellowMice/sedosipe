@@ -23,10 +23,14 @@ function constructInterface() { return Promise.all([
 				$("<a>").addClass("navigation-menu-button top-bar-button material-icons").html("menu").attr("href", "javascript:void(0)").click(toggleSideBar),
 				$("<h1>").addClass("top-bar-heading").text("sedosipE"),
 				$("<div>").addClass("top-bar-right-buttons").append(
+					$("<a>").addClass("top-bar-button material-icons").html("add").attr("href", "javascript:void(0)"),
 					$("<a>").addClass("top-bar-button material-icons").html("search").attr("href", "javascript:void(0)"),
 					$("<a>").addClass("top-bar-button material-icons").html("more_vert").attr("href", "javascript:void(0)").click(createMenu([
 						{
 							name: "{{ refresh }}"
+						},
+						{
+							name: "{{ export }}"
 						},
 						{
 							name: "{{ settings }}"
@@ -82,7 +86,7 @@ function createMenu(list) { return function(event) {
 	var div = $("<div>").addClass("menu");
 	list.forEach(function(item) {
 		var newItem = $("<a>").text(item.name).attr("href", "javascript:void(0)");
-		if (item.behavior) newItem.click(behavior);
+		if (item.behavior) newItem.click(destroyMenu).click(behavior);
 		div.append(newItem);
 	});
 
@@ -91,12 +95,36 @@ function createMenu(list) { return function(event) {
 		left: (event.pageX - 144 + 12) + "px"
 	});
 
-	var catcher = $("<div>").addClass("menu-outside-catcher").click(function() {
+	var catcher = $("<div>").addClass("menu-outside-catcher").click(destroyMenu);
+
+	$("body").append(catcher, div);
+
+	function destroyMenu() {
 		$(".menu").velocity("fadeOut", { duration: 200, complete: function() {
 			$(".menu-outside-catcher").remove();
 			$(".menu").remove();
 		} });
-	});
-
-	$("body").append(catcher, div);
+	}
 } }
+
+var db;
+// Load database from localStorage or other cloud services, or create a new one
+function loadDatabase() { return new Promise(function(resolve) {
+	var sql = window.SQL;
+	if (localStorage.hasOwnProperty("database")) {
+		// Load existing
+		db = new sql.Database(new TextEncoder("utf-16le").encode(localStorage.getItem("database")));
+	} else {
+		// Create new
+		db = new sql.Database();
+		db.run("CREATE TABLE metadata (version int, time_created int, time_modified int)");
+		db.run("INSERT INTO metadata (version, time_created, time_modified) VALUES (1, " + Date.now() + ", " + Date.now() + ")");
+		localStorage.setItem("database", new TextDecoder("utf-16le").decode(db.export()));
+	}
+	console.log(
+		"Database info:\n" +
+		"    Creation time: " + new Date(db.exec("SELECT time_created FROM metadata")[0].values[0][0]) + "\n" +
+		"    Last modified: " + new Date(db.exec("SELECT time_modified FROM metadata")[0].values[0][0])
+	);
+	resolve();
+}); }

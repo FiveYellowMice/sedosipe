@@ -8,7 +8,13 @@
 
 		<meta name="theme-color" content="#3F51B5">
 
-		<script>if (!window.Promise) document.write("<script src=\"{{ baseurl }}/bower_components/es6-promise-polyfill/promise.min.js\"><\/script>");</script>
+		<script>
+			if (!window.Promise) document.write("<script src=\"{{ baseurl }}/bower_components/es6-promise-polyfill/promise.min.js\"><\/script>");
+			if (!window.TextEncoder && !window.TextDecoder) {
+				document.write("<script src=\"{{ baseurl }}/bower_components/text-encoding/lib/encoding-indexes.js\"><\/script>");
+				document.write("<script src=\"{{ baseurl }}/bower_components/text-encoding/lib/encoding-.js\"><\/script>");
+			}
+		</script>
 
 		<style>
 			html, body,
@@ -117,12 +123,15 @@
 				}); }
 
 				Promise.all([
+					require("{{ baseurl }}/js/sql.js"),
 					require("{{ baseurl }}/bower_components/lodash/dist/lodash.min.js"),
 					require("{{ baseurl }}/bower_components/jquery/dist/jquery.min.js")
 						.then(function() { return require("{{ baseurl }}/bower_components/velocity/velocity.min.js"); }),
 					require("{{ baseurl }}/js/main.js")
-				]).then(function() { constructInterface(); })
-				.then(function() { clearInterval(animationId); });
+				]).then(function() {
+					constructInterface().then(function() { clearInterval(animationId); });
+					loadDatabase();
+				});
 			});
 			</script>
 		</div>
