@@ -115,13 +115,6 @@
 				}, 800);
 
 				// Load massive JavaScripts
-				function require(link) { return new Promise(function(resolve) {
-					var el = document.createElement("script");
-					document.getElementsByTagName("body")[0].appendChild(el);
-					el.addEventListener("load", resolve);
-					el.src = link;
-				}); }
-
 				Promise.all([
 					require("{{ baseurl }}/js/sql.js"),
 					require("{{ baseurl }}/bower_components/lodash/dist/lodash.min.js"),
@@ -131,6 +124,13 @@
 				]).then(function() { return doConstruction(); })
 				.then(function() { clearInterval(animationId); });
 			});
+
+			function require(link) { return new Promise(function(resolve) {
+				var el = document.createElement("script");
+				document.getElementsByTagName("body")[0].appendChild(el);
+				el.addEventListener("load", resolve);
+				el.src = link;
+			}); }
 			</script>
 		</div>
 	</body>

@@ -34,7 +34,14 @@ function doConstruction() { return Promise.all([
 							name: "{{ refresh }}"
 						},
 						{
-							name: "{{ export }}"
+							name: "{{ export }}",
+							behavior: function() {
+								if (!window.exportDB && !window.importDB) {
+									require("{{ baseurl }}/js/backup.js").then(function() { exportDB(); });
+								} else {
+									exportDB();
+								}
+							}
 						},
 						{
 							name: "{{ settings }}"
@@ -189,7 +196,7 @@ function createMenu(list) { return function(event) {
 	var div = $("<div>").addClass("menu");
 	list.forEach(function(item) {
 		var newItem = $("<a>").text(item.name).attr("href", "javascript:void(0)");
-		if (item.behavior) newItem.click(destroyMenu).click(behavior);
+		if (item.behavior) newItem.click(destroyMenu).click(item.behavior);
 		div.append(newItem);
 	});
 
