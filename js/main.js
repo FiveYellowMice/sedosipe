@@ -93,24 +93,72 @@ function doConstruction() { return Promise.all([
 	var list = $("<ol>").addClass("show-list");
 	$(".main-interface").append(list);
 
-	var shows = db.exec("SELECT title, status, total_episodes, watched_episodes FROM shows")[0].values;
-	shows.forEach(function(show) {
-		list.append($("<li>")
-			.addClass("show-item")
-			.append(
-				$("<span>").addClass("show-title").text(show[0])
-			).append($("<div>").addClass("show-item-right-part").append(
-				$("<span>").addClass("show-item-status").text(String(show[1])),
-				$("<a>").addClass("show-item-button material-icons").html("more_vert").attr("href", "javascript:void(0)").click(createMenu([
-					{
-						name: "{{ delete }}"
-					},
-					{
-						name: "{{ detial }}"
-					}
-				]))
-			))
-		);
+	var query = db.exec("SELECT id, image, title, status, total_episodes, watched_episodes FROM shows");
+	if (query.length === 0) {
+		resolve();
+		return;
+	}
+	query[0].values.forEach(function(show) {
+		var item = $("<li>").addClass("show-item");
+		list.append(item);
+
+		item.append($("<div>").addClass("show-id").text(show[0]));
+		item.append($("<div>").addClass("show-image").css("background-image", "url(\"" + (show[1] || "data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACwAAAAAAQABAAACAkQBADs=") + "\")"));
+		item.append($("<div>").addClass("show-title").text(show[2]));
+
+		var rightPart = $("<div>").addClass("show-item-right-part");
+		item.append(rightPart);
+
+		rightPart.append($("<span>").addClass("show-item-status").text((function(status, total, watched) {
+			// Show info on different statuses
+			if (status === "watching") {
+				if (total && watched) {
+					return total + " / " + watched + " - {{ watchingShows }}";
+				} else if (total) {
+					return "{{ totalHave }}".replace("$n", String(total)) + " - {{ watchingShows }}";
+				} else if (watched) {
+					return "{{ numberSoFar }}".replace("$n", String(watched)) + " - {{ watchingShows }}";
+				} else {
+					return "{{ watchingShows }}";
+				}
+			} else if (status === "completed") {
+				if (total) {
+					return total + " - {{ completedShows }}";
+				} else {
+					return "{{ completedShows }}";
+				}
+			} else if (status === "dropped") {
+				if (total && watched) {
+					return total + " / " + watched + " - {{ droppedShows }}";
+				} else if (total) {
+					return "{{ totalHave }}".replace("$n", String(total)) + " - {{ droppedShows }}";
+				} else if (watched) {
+					return "{{ numberSoFar }}".replace("$n", String(watched)) + " - {{ droppedShows }}";
+				} else {
+					return "{{ droppedShows }}";
+				}
+			} else if (status === "planned") {
+				return "{{ plannedShows }}";
+			} else {
+				return String(status);
+			}
+		})(show[3], show[4], show[5])));
+
+		if (show[3] === "watching") { // +1 button if watching
+			rightPart.append($("<a>").addClass("show-item-button material-icons").html("plus_one").attr("href", "javascript:void(0)"));
+		}
+		if (show[3] === "planned") { // Start watching button
+			rightPart.append($("<a>").addClass("show-item-button material-icons").html("play_arrow").attr("href", "javascript:void(0)"));
+		}
+
+		rightPart.append($("<a>").addClass("show-item-button material-icons").html("more_vert").attr("href", "javascript:void(0)").click(createMenu([
+			{
+				name: "{{ edit }}"
+			},
+			{
+				name: "{{ delete }}"
+			}
+		])));
 	});
 	resolve();
 

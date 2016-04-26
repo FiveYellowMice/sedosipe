@@ -15,5 +15,8 @@ refresh: Refresh
 export: Export
 settings: Settings
 
+edit: Edit
 delete: Delete
-detial: Detial
+
+totalHave: $n total
+numberSoFar: $n so far
