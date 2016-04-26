@@ -113,7 +113,7 @@ function doConstruction() { return Promise.all([
 			// Show info on different statuses
 			if (status === "watching") {
 				if (total && watched) {
-					return total + " / " + watched + " - {{ watchingShows }}";
+					return watched + " / " + total + " - {{ watchingShows }}";
 				} else if (total) {
 					return "{{ totalHave }}".replace("$n", String(total)) + " - {{ watchingShows }}";
 				} else if (watched) {
