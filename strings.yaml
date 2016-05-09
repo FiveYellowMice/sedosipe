@@ -20,3 +20,6 @@ delete: Delete
 
 totalHave: $n total
 numberSoFar: $n so far
+
+cancel: Cancel
+save: Save
