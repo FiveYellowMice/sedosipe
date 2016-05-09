@@ -1,5 +1,5 @@
-function exportDB() { return new Promise(function(resolve) {
-	var blob = new Blob([db.export()], { type: "application/octet-stream" });
+sedosipe.exportDB = function exportDB() { return new Promise(function(resolve) {
+	var blob = new Blob([sedosipe.db.export()], { type: "application/octet-stream" });
 	if (!window.URL) window.URL = window.webkitURL;
 	var url = URL.createObjectURL(blob);
 	var el = document.createElement("a");
@@ -13,6 +13,6 @@ function exportDB() { return new Promise(function(resolve) {
 	resolve();
 }); }
 
-function importDB() { return new Promise(function(resolve) {
+sedosipe.importDB = function importDB() { return new Promise(function(resolve) {
 	resolve();
 }); }

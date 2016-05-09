@@ -1,7 +1,9 @@
-var db;
-var preferences = {};
+var sedosipe = {};
 
-function doConstruction() { return Promise.all([
+sedosipe.db = null;
+sedosipe.preferences = {};
+
+sedosipe.doConstruction = function doConstruction() { return Promise.all([
 
 	new Promise(function(resolve) {
 		$("head").append($("<link>")
@@ -24,22 +26,22 @@ function doConstruction() { return Promise.all([
 		$("body").append(
 			// Top bar
 			$("<div>").addClass("topbar").append(
-				$("<a>").addClass("navigation-menu-button top-bar-button material-icons").html("menu").attr("href", "javascript:void(0)").click(toggleSideBar),
+				$("<a>").addClass("navigation-menu-button top-bar-button material-icons").html("menu").attr("href", "javascript:void(0)").click(sedosipe.toggleSideBar),
 				$("<h1>").addClass("top-bar-heading").text("sedosipE"),
 				$("<div>").addClass("top-bar-right-buttons").append(
 					$("<a>").addClass("top-bar-button material-icons").html("add").attr("href", "javascript:void(0)"),
 					$("<a>").addClass("top-bar-button material-icons").html("search").attr("href", "javascript:void(0)"),
-					$("<a>").addClass("top-bar-button material-icons").html("more_vert").attr("href", "javascript:void(0)").click(createMenu([
+					$("<a>").addClass("top-bar-button material-icons").html("more_vert").attr("href", "javascript:void(0)").click(sedosipe.createMenu([
 						{
 							name: "{{ refresh }}"
 						},
 						{
 							name: "{{ export }}",
 							behavior: function() {
-								if (!window.exportDB && !window.importDB) {
-									require("{{ baseurl }}/js/backup.js").then(function() { exportDB(); });
+								if (!sedosipe.exportDB && !sedosipe.importDB) {
+									require("{{ baseurl }}/js/backup.js").then(function() { sedosipe.exportDB(); });
 								} else {
-									exportDB();
+									sedosipe.exportDB();
 								}
 							}
 						},
@@ -62,7 +64,7 @@ function doConstruction() { return Promise.all([
 				}
 				return div;
 			}),
-			$("<div>").addClass("sidebar-outside-catcher").click(function() { toggleSideBar(false); }),
+			$("<div>").addClass("sidebar-outside-catcher").click(function() { sedosipe.toggleSideBar(false); }),
 
 			// Content area
 			$("<div>").addClass("main-interface")
@@ -75,23 +77,23 @@ function doConstruction() { return Promise.all([
 		var sql = window.SQL;
 		if (localStorage.hasOwnProperty("database")) {
 			// Load existing
-			db = new sql.Database(new TextEncoder("utf-16le").encode(localStorage.getItem("database")));
+			sedosipe.db = new sql.Database(new TextEncoder("utf-16le").encode(localStorage.getItem("database")));
 		} else {
 			// Create new
-			db = new sql.Database();
-			db.run("CREATE TABLE metadata (version int, time_created int, time_modified int)");
-			db.run("INSERT INTO metadata (version, time_created, time_modified) VALUES (1, " + Date.now() + ", " + Date.now() + ")");
-			db.run("CREATE TABLE shows (id INTEGER PRIMARY KEY, title text NOT NULL, image text, stars int CHECK(stars >= 0 AND stars <= 5), status text, total_episodes int, watched_episodes int, start_date int, finish_date int, comment text)");
+			sedosipe.db = new sql.Database();
+			sedosipe.db.run("CREATE TABLE metadata (version int, time_created int, time_modified int)");
+			sedosipe.db.run("INSERT INTO metadata (version, time_created, time_modified) VALUES (1, " + Date.now() + ", " + Date.now() + ")");
+			sedosipe.db.run("CREATE TABLE shows (id INTEGER PRIMARY KEY, title text NOT NULL, image text, stars int CHECK(stars >= 0 AND stars <= 5), status text, total_episodes int, watched_episodes int, start_date int, finish_date int, comment text)");
 			/*
 			ID | Title | Image | Stars | Status | Total episodes | Watched episodes | Start date | Finish date | Comment
 			*/
-			saveDB();
+			sedosipe.saveDB();
 		}
 		console.log(
 			"Database info:\n" +
-			"    Format version: " + db.exec("SELECT version FROM metadata")[0].values[0][0] + "\n" +
-			"    Creation time: " + new Date(db.exec("SELECT time_created FROM metadata")[0].values[0][0]) + "\n" +
-			"    Last modified: " + new Date(db.exec("SELECT time_modified FROM metadata")[0].values[0][0])
+			"    Format version: " + sedosipe.db.exec("SELECT version FROM metadata")[0].values[0][0] + "\n" +
+			"    Creation time: " + new Date(sedosipe.db.exec("SELECT time_created FROM metadata")[0].values[0][0]) + "\n" +
+			"    Last modified: " + new Date(sedosipe.db.exec("SELECT time_modified FROM metadata")[0].values[0][0])
 		);
 		resolve();
 	})
@@ -100,7 +102,7 @@ function doConstruction() { return Promise.all([
 	var list = $("<ol>").addClass("show-list");
 	$(".main-interface").append(list);
 
-	var query = db.exec("SELECT id, image, title, status, total_episodes, watched_episodes FROM shows");
+	var query = sedosipe.db.exec("SELECT id, image, title, status, total_episodes, watched_episodes FROM shows");
 	if (query.length === 0) {
 		resolve();
 		return;
@@ -158,7 +160,7 @@ function doConstruction() { return Promise.all([
 			rightPart.append($("<a>").addClass("show-item-button material-icons").html("play_arrow").attr("href", "javascript:void(0)"));
 		}
 
-		rightPart.append($("<a>").addClass("show-item-button material-icons").html("more_vert").attr("href", "javascript:void(0)").click(createMenu([
+		rightPart.append($("<a>").addClass("show-item-button material-icons").html("more_vert").attr("href", "javascript:void(0)").click(sedosipe.createMenu([
 			{
 				name: "{{ edit }}"
 			},
@@ -173,7 +175,7 @@ function doConstruction() { return Promise.all([
 	$(".preload").velocity("fadeOut", { duration: 400, easing: "easeInOutCubic" }, resolve);
 }); }); }
 
-function toggleSideBar(arg) {
+sedosipe.toggleSideBar = function toggleSideBar(arg) {
 	// Open or close side bar based on a boolean argument, if not, toggle it.
 	var sidebar = $(".sidebar");
 	var toggle;
@@ -191,7 +193,7 @@ function toggleSideBar(arg) {
 	}
 }
 
-function createMenu(list) { return function(event) {
+sedosipe.createMenu = function createMenu(list) { return function(event) {
 	// Returns a function that shows menu UI component created on a list of objects with compulsory name and optional behavior.
 	var div = $("<div>").addClass("menu");
 	list.forEach(function(item) {
@@ -218,11 +220,11 @@ function createMenu(list) { return function(event) {
 } }
 
 // Function should be run every time DB is modified
-function updateDB() {
-	db.run("UPDATE metadata SET time_modified = " + Date.now());
-	if (preferences.autoSave) saveDB();
+sedosipe.updateDB = function updateDB() {
+	sedosipe.db.run("UPDATE metadata SET time_modified = " + Date.now());
+	if (sedosipe.preferences.autoSave) saveDB();
 }
 
-function saveDB() {
-	localStorage.setItem("database", new TextDecoder("utf-16le").decode(db.export()));
+sedosipe.saveDB = function saveDB() {
+	localStorage.setItem("database", new TextDecoder("utf-16le").decode(sedosipe.db.export()));
 }
