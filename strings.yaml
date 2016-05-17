@@ -21,5 +21,10 @@ delete: Delete
 totalHave: $n total
 numberSoFar: $n so far
 
+title: Title
+status: Status
+watchedEpisodes: Watched Episodes
+totalEpisodes: Total Episodes
+
 cancel: Cancel
 save: Save
