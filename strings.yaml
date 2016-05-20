@@ -23,6 +23,7 @@ numberSoFar: $n so far
 
 title: Title
 status: Status
+image: Image
 watchedEpisodes: Watched Episodes
 totalEpisodes: Total Episodes
 

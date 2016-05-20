@@ -7,25 +7,33 @@ sedosipe.editItem = function editItem(item) { return new Promise(function(resolv
 		$("<div>").addClass("show-editing-components").append(
 			$("<div>").addClass("show-editing-image").append(
 				$("<div>").addClass("show-editing-image-preview").css("background-image", "url(\"" + (show.image || "data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACwAAAAAAQABAAACAkQBADs=") + "\")"),
-				$("<input>").addClass("show-editing-image-url").val(show.image || "")
+				$("<span>").addClass("show-editing-label").text("{{ image }}"),
+				$("<input>").addClass("show-editing-image-url show-editing-field").val(show.image || "")
 			),
-			$("<h2>").addClass("show-editing-title-large").text(show.title),
-			$("<span>").addClass("show-editing-label").text("{{ title }}"),
-			$("<input>").addClass("show-editing-title show-editing-field").val(show.title || ""),
-			$("<span>").addClass("show-editing-field").text("{{ status }}"),
-			$("<select>").addClass("show-editing-status").append(function() { // Create a drop down menu and select right choice here
-				result = [];
-				[["watching", "{{ watchingShows }}"], ["completed", "{{ completedShows }}"], ["dropped", "{{ droppedShows }}"], ["planned", "{{ plannedShows }}"]].forEach(function(option) {
-					var el = $("<option>").val(option[0]).text(option[1]);
-					if (show.status === option[0]) el.attr("selected", "selected");
-					result.push(el);
-				});
-				return result;
-			}),
-			$("<span>").addClass("show-editing-label").text("{{ watchedEpisodes }}"),
-			$("<input>").addClass("show-editing-watched show-editing-field").attr("type", "number").val(show.watchedEpisodes || 0),
-			$("<span>").addClass("show-editing-label").text("{{ totalEpisodes }}"),
-			$("<input>").addClass("show-editing-total show-editing-field").attr("type", "number").val(show.totalEpisodes || 0)
+			$("<div>").addClass("show-editing-text").append(
+				$("<span>").addClass("show-editing-label").text("{{ title }}"),
+				$("<input>").addClass("show-editing-title show-editing-field").val(show.title || ""),
+				$("<span>").addClass("show-editing-label").text("{{ status }}"),
+				$("<select>").addClass("show-editing-status show-editing-field").append(function() { // Create a drop down menu and select right choice here
+					result = [];
+					[["watching", "{{ watchingShows }}"], ["completed", "{{ completedShows }}"], ["dropped", "{{ droppedShows }}"], ["planned", "{{ plannedShows }}"]].forEach(function(option) {
+						var el = $("<option>").val(option[0]).text(option[1]);
+						if (show.status === option[0]) el.attr("selected", "selected");
+						result.push(el);
+					});
+					return result;
+				}),
+				$("<div>").addClass("show-editing-episodes").append(
+					$("<div>").append(
+						$("<span>").addClass("show-editing-label").text("{{ watchedEpisodes }}"),
+						$("<input>").addClass("show-editing-watched show-editing-field").attr("type", "number").val(show.watchedEpisodes || 0)
+					),
+					$("<div>").append(
+						$("<span>").addClass("show-editing-label").text("{{ totalEpisodes }}"),
+						$("<input>").addClass("show-editing-total show-editing-field").attr("type", "number").val(show.totalEpisodes || 0)
+					)
+				)
+			)
 		).hide(),
 
 		$("<div>").addClass("show-editing-actions").append(
