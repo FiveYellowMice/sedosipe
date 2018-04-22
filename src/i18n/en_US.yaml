@@ -1,0 +1,47 @@
+application:
+  page_not_found: Page Not Found
+  search: Search
+  settings: Settings
+  other_statuses_menu: Other Statuses
+  close_sidebar: Close Sidebar
+
+library:
+  common: &library_common
+    status: &library_common_status
+      all: All
+      current: Currently Reading/Watching
+      planned: Planned to Read/Watch
+      completed: Completed
+      on_hold: On Hold
+      dropped: Dropped
+    cover_picture_of_name: Cover picture of {name}
+    start_consuming: Start Consuming
+    progress_plus_one: Read/Watched One Chapter/Episode
+    set_complete: Set as Completed
+    drop: Drop
+    hold: Hold
+    resume_consuming: Resume Consuming
+    consume_again: Consume Again
+    more_actions: More Actions
+    delete_from_library: Delete from Library
+    open_entry_details: Show Details
+  book:
+    <<: *library_common
+    status:
+      <<: *library_common_status
+      current: Currently Reading
+      planned: Planned to Read
+    start_consuming: Start Reading
+    resume_consuming: Resume Reading
+    consume_again: Read Again
+    progress_plus_one: Read One Chapter
+  series:
+    <<: *library_common
+    status:
+      <<: *library_common_status
+      current: Currently Watching
+      planned: Planned to Watch
+    start_consuming: Start Watching
+    resume_consuming: Resume Watching
+    consume_again: Watch Again
+    progress_plus_one: Watched One Episode
